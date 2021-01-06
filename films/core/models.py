@@ -5,6 +5,14 @@ from django.urls import reverse
 from users.models import CustomUser
 
 
+class Rubric(models.Model):
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
 class Actor(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
@@ -18,8 +26,20 @@ class Movie(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
     actors = models.ManyToManyField(Actor, verbose_name="actors", related_name="film_actor")
+    rubric = models.ForeignKey(Rubric, on_delete=models.CASCADE)
     slug = models.SlugField(max_length=130, unique=True)
     is_published = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
+
+
+class ScreenShot(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    slug = models.SlugField(max_length=100)
+    image = models.ImageField(upload_to='media')
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
