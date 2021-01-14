@@ -1,5 +1,7 @@
-from django.db import models
 from datetime import date
+
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 from django.urls import reverse
 
 from users.models import CustomUser
@@ -43,6 +45,26 @@ class ScreenShot(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Rating(models.Model):
+    user = models.ForeignKey(CustomUser,
+                             on_delete=models.deletion.CASCADE,
+                             null=True,
+                             blank=True)
+    star = models.IntegerField(default=1,
+                               validators=[
+                                   MaxValueValidator(10),
+                                   MinValueValidator(1)
+                               ])
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, verbose_name="film")
+
+    def __str__(self):
+        return f"{self.star} - {self.movie}"
+
+    class Meta:
+        verbose_name = "Rating"
+        verbose_name_plural = "Ratings"
 
 
 class Review(models.Model):
