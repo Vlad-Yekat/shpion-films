@@ -4,6 +4,7 @@ from rest_framework import status
 
 from core.models import Movie, Review
 from .serializers import MovieListSerializer, MovieDetailSerializer, ReviewCreateSerializer
+from .serializers import CreateRatingSerializer
 
 
 class MovieListView(APIView):
@@ -34,3 +35,15 @@ class ReviewCreateView(APIView):
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
+
+
+class AddRatingView(APIView):
+    serializer_class = CreateRatingSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

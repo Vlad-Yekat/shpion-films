@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Movie, Review
+from core.models import Movie, Review, Rating
 
 
 class MovieListSerializer(serializers.ModelSerializer):
@@ -47,3 +47,16 @@ class MovieDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CreateRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = ('star', 'movie', 'user')
+
+    def create(self, validated_data):
+        print(validated_data)
+        rating = Rating.objects.update_or_create(
+            user=validated_data.get('user', None),
+            movie=validated_data.get('movie', None),
+            defaults={'star': validated_data.get('star')}
+        )
+        return rating
