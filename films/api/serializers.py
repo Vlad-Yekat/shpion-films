@@ -4,9 +4,12 @@ from core.models import Movie, Review, Rating
 
 
 class MovieListSerializer(serializers.ModelSerializer):
+    rating_user = serializers.BooleanField()
+    rating_all = serializers.FloatField()
+
     class Meta:
         model = Movie
-        fields = ('title', 'description')
+        fields = ('id', 'title', 'description', 'rating_user', 'rating_all')
 
 
 class RecursiveSerializer(serializers.Serializer):
@@ -17,6 +20,7 @@ class RecursiveSerializer(serializers.Serializer):
 
 class FilterReviewSerializer(serializers.ListSerializer):
     """ Only parents """
+
     def to_representation(self, data):
         data = data.filter(parent=None)
         return super().to_representation(data)

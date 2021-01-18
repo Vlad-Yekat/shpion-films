@@ -57,7 +57,8 @@ class Rating(models.Model):
                                    MaxValueValidator(10),
                                    MinValueValidator(1)
                                ])
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, verbose_name="film")
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, verbose_name="film",
+                              related_name="ratings")
 
     def __str__(self):
         return f"{self.star} - {self.movie}"

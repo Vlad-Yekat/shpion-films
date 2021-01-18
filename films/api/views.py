@@ -1,3 +1,4 @@
+from django.db import models
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -11,7 +12,12 @@ class MovieListView(APIView):
     serializer_class = MovieListSerializer
 
     def get(self, request):
-        data = Movie.objects.all()
+        data = Movie.objects.filter(is_published=True).annotate(
+            rating_user=models.Count("ratings", filter=models.Q(ratings__user=request.user))
+            ).annotate(
+            rating_all=models.Sum(models.F("ratings__star"))/models.Count(models.F("ratings"))
+        )
+
         serializer = self.serializer_class(data, many=True)
         return Response(serializer.data)
 
