@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Movie, Review, Rating
+from core.models import Movie, Review, Rating, Actor
 
 
 class MovieListSerializer(serializers.ModelSerializer):
@@ -10,6 +10,18 @@ class MovieListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
         fields = ('id', 'title', 'description', 'rating_user', 'rating_all')
+
+
+class ActorListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Actor
+        fields = ('id', 'name', 'description', 'image')
+
+
+class ActorDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Actor
+        fields = '__all__'
 
 
 class RecursiveSerializer(serializers.Serializer):
@@ -43,7 +55,7 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
 
 class MovieDetailSerializer(serializers.ModelSerializer):
     rubric = serializers.SlugRelatedField(slug_field='slug', read_only=True)
-    actors = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
+    actors = ActorDetailSerializer(many=True, read_only=True)
     reviews = ReviewSerializer(many=True)
 
     class Meta:
