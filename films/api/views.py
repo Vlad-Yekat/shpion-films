@@ -8,52 +8,32 @@ from .serializers import MovieListSerializer, MovieDetailSerializer, ReviewCreat
 from .serializers import CreateRatingSerializer, ActorListSerializer, ActorDetailSerializer
 
 
-class MovieListView(APIView):
+class MovieListView(generics.ListAPIView):
     serializer_class = MovieListSerializer
 
-    def get(self, request):
+    def get_queryset(self):
         data = Movie.objects.filter(is_published=True).annotate(
-            rating_user=models.Count("ratings", filter=models.Q(ratings__user=request.user))
+            rating_user=models.Count("ratings", filter=models.Q(ratings__user=self.request.user))
             ).annotate(
             rating_all=models.Sum(models.F("ratings__star"))/models.Count(models.F("ratings"))
         )
-
-        serializer = self.serializer_class(data, many=True)
-        return Response(serializer.data)
+        return data
 
 
-class MovieDetailView(APIView):
+class MovieDetailView(generics.RetrieveAPIView):
     serializer_class = MovieDetailSerializer
-
-    def get(self, request, pk):
-        data = Movie.objects.get(id=pk)
-        serializer = self.serializer_class(data)
-        return Response(serializer.data)
+    queryset = Movie.objects.all()
 
 
-class ReviewCreateView(APIView):
+class ReviewCreateView(generics.CreateAPIView):
     serializer_class = ReviewCreateSerializer
 
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
-
-class AddRatingView(APIView):
+class AddRatingView(generics.CreateAPIView):
     serializer_class = CreateRatingSerializer
 
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 class ActorListView(generics.ListAPIView):
 
