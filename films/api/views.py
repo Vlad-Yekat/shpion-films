@@ -2,7 +2,7 @@ from django.db import models
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status, generics
-
+from django_filters.rest_framework import DjangoFilterBackend
 from core.models import Movie, Review, Actor
 from .serializers import MovieListSerializer, MovieDetailSerializer, ReviewCreateSerializer
 from .serializers import CreateRatingSerializer, ActorListSerializer, ActorDetailSerializer
@@ -10,6 +10,7 @@ from .serializers import CreateRatingSerializer, ActorListSerializer, ActorDetai
 
 class MovieListView(generics.ListAPIView):
     serializer_class = MovieListSerializer
+    filter_backends = (DjangoFilterBackend,)
 
     def get_queryset(self):
         data = Movie.objects.filter(is_published=True).annotate(
